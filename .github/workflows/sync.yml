@@ -12,23 +12,12 @@ jobs:
       - name: Checkout the code
         uses: actions/checkout@v3
         with:
-          # 必须为 0，确保可以推送全部提交历史
           fetch-depth: 0
 
-      - name: Setup SSH
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.GITEE_SSH_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan gitee.com >> ~/.ssh/known_hosts
-
-      - name: Set git config
-        run: |
-          git config user.name "github-actions"
-          git config user.email "actions@github.com"
-
       - name: Push to Gitee
+        env:
+          GITEE_USERNAME: ${{ secrets.GITEE_USERNAME }}
+          GITEE_TOKEN: ${{ secrets.GITEE_TOKEN }}
         run: |
-          git remote add gitee git@gitee.com:jihaoyun/japanese-vocabulary.git
-          # 强制推送保证分支完全同步
+          git remote add gitee https://$GITEE_USERNAME:$GITEE_TOKEN@gitee.com/jihaoyun/japanese-vocabulary.git
           git push gitee HEAD:main -f
